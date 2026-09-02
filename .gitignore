@@ -1,0 +1,38 @@
+# Env & secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Android / iOS
+*.iml
+.gradle/
+local.properties
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Data & artifacts
+*.db
+*.sqlite3
+data/
+snapshots/
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
