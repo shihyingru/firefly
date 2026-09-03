@@ -72,4 +72,5 @@ audit_log / finance_record (event streams, append-only)
 - post_snapshot: permanent (evidentiary); on successful appeal via governance, content_text may be masked while hash and archive pointer remain
 - vote: permanent (anonymous); open-data release is k-anonymized
 - Abuse-prevention temporaries (IP, rate windows): 24-hour rolling deletion
+- Onboarding push handle (D-014): after explicit consent, the encrypted LINE userId lives in Redis only, TTL = onboarding days × 24h + 1h; deleted on expiry, block or unfollow; never in PostgreSQL or backups
 - Backups: daily encrypted offsite; restore drill quarterly

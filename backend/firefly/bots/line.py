@@ -4,8 +4,8 @@ LINE Bot(文件 7.1)/ LINE bot webhook.
 - 訊息含 URL → 正規化 → lookup → Flex 卡片(或處理中/查無/無法取得)
 - postback vote:<card_id>:<1|0> → 以 LINE userId 的 HMAC 代號投票(D-011);原始 userId 不落地
 - postback relookup:<url> → 再查一次(D-008)
-- 只用 reply token;不 push
-- 「明日佇列」push 需要保存可推播的識別碼,與文件 08 衝突,待決議(見文件 17 D-014 提案)
+- 只用 reply token;唯一的 push 場景是 D-014 引導期(line_onboarding.py,feature flag,預設關閉)
+- 富選單 postback queue:today → 以 reply 回今日佇列(零儲存)
 """
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ from ..services.cards import cast_vote, get_visible_card
 from ..services.lookup import lookup as do_lookup
 from ..services.urlnorm import InvalidURL, extract_urls, normalize_url
 from . import line_flex as flex
+from . import line_onboarding as onboarding
 from .line_client import get_line_client, verify_signature
 
 router = APIRouter(prefix="/v1/line")
@@ -49,11 +50,24 @@ async def webhook(request: Request, session: AsyncSession = Depends(get_db), x_l
 async def handle_event(session: AsyncSession, ev: dict) -> list[dict]:
     etype = ev.get("type")
     user_id = (ev.get("source") or {}).get("userId")
-    if etype == "follow":
-        return [flex.welcome_message()]
     if not user_id:
-        return []
+        return [flex.welcome_message()] if etype == "follow" else []
     contributor = await contrib_svc.get_or_create_line_contributor(session, user_id)
+    if etype == "follow":
+        # 第 0 天:歡迎 + 今日佇列(reply,零儲存)+ 引導期邀請(僅在 flag 開啟時)
+        msgs = [flex.welcome_message()] + await onboarding.queue_messages(session, contributor)
+        if onboarding.enabled():
+            msgs.append(onboarding.onboarding_offer_message())
+        await session.commit()
+        return msgs[:5]
+    if etype == "unfollow":
+        await onboarding.unenroll(contributor.origin_key_hash)
+        return []
+    if etype == "postback" and (ev.get("postback") or {}).get("data") == "onboard:yes":
+        ok = await onboarding.enroll(session, contributor, user_id)
+        await session.commit()
+        del user_id
+        return [{"type": "text", "text": "好,接下來每天傳給你。" if ok else "目前無法開啟每日推播。你可以按選單的「今日佇列」自取。"}]
     del user_id  # 原始 userId 到此為止 / raw userId goes no further
     rate = await ratelimit.check_contributor(str(contributor.id))
     if not rate.allowed:
@@ -80,6 +94,12 @@ async def handle_event(session: AsyncSession, ev: dict) -> list[dict]:
             return [flex.thanks_message(v.weight > 0)]
         if data.startswith("relookup:"):
             return await _lookup_reply(session, contributor, data[len("relookup:"):])
+        if data == "queue:today":
+            msgs = await onboarding.queue_messages(session, contributor)
+            await session.commit()
+            return msgs
+        if data == "onboard:no":
+            return [{"type": "text", "text": "好。想仲裁時,按選單的「今日佇列」即可。"}]
     return []
 
 

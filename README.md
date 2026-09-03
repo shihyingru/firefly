@@ -112,7 +112,8 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 | `backend/firefly/models.py` | 文件 08 資料模型 / doc-08 data model |
 | `backend/firefly/api/routes.py` | 文件 06 端點 / doc-06 endpoints |
 | `backend/tests/test_privacy_guard.py` | 「明確不存」守衛 / never-stored guard |
-| `backend/firefly/bots/line.py` | LINE Bot webhook(文件 7.1)/ LINE bot webhook |
+| `backend/firefly/bots/line.py`、`line_onboarding.py` | LINE Bot webhook 與引導期推播(文件 7.1、D-014)/ LINE bot + onboarding push |
+| `docs/governance/notice-D-014.md` | 新增資料項的 30 天公示稿 / 30-day notice for the new data item |
 | `backend/firefly/bots/threads.py` | Threads Bot:webhook + mentions 輪詢 + 發文 log(文件 7.2)/ Threads bot |
 | `backend/firefly/api/pages.py` | 卡片網頁(投票落點)/ card web page |
 | `backend/firefly/bridging/` | 橋接引擎:矩陣分解、光譜覆蓋、突發灌票、Phase A/B / bridging engine |

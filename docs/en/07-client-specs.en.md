@@ -10,7 +10,8 @@
 - Voting: postback event carries card_id; server uses a one-way hash of the LINE userId as the contributor handle (no raw-userId mapping table stored); the hash is HMAC-SHA256 with a server secret in an environment variable, rotated via runbook
 - Always reply via reply token (free); never proactive push (zero cost, zero annoyance)
 - When /lookup returns 202 (drafting): reply a "processing" message via the reply token with a "check again" button (postback carrying the original URL). No push, no waiting
-- "Daily queue": rich-menu toggle; opted-in users get 5 cards/day via push (the only push scenario; small volume)
+- "Today's queue": rich-menu postback `queue:today`, answered via reply with 5 cards (zero storage)
+- Onboarding push (D-014): on day 0 the follow reply carries the queue and an invitation; consenting users receive 5 cards by push daily for N days (initially 3), the last push carrying self-serve instructions; this is the only push scenario, governed by a daily cap and a feature flag
 
 ## 7.2 Threads Reply Bot (Wave 1, technical-validation item)
 

@@ -105,7 +105,11 @@ class ThreadsCfg(BaseModel):
 
 class LineCfg(BaseModel):
     enabled: bool = True
-    daily_queue_push_enabled: bool = False
+    onboarding_push_enabled: bool = False  # D-014:公示期結束前維持 false / stays false until the doc-10 notice period ends
+    onboarding_push_days: int = 3
+    onboarding_push_hour_local: int = 20   # Asia/Taipei
+    onboarding_push_daily_cap: int = 100
+    queue_size: int = 5
 
 
 class CorsCfg(BaseModel):
@@ -143,6 +147,7 @@ class Settings(BaseSettings):
     service_token: str = "dev-service-token-change-me"
     line_channel_secret: str = ""
     line_channel_access_token: str = ""
+    line_push_enc_key: str = ""  # Fernet key(base64 32 bytes);D-014 引導期推播用,輪替走 runbook / rotate via runbook
     threads_app_id: str = ""
     threads_app_secret: str = ""
     threads_user_token: str = ""

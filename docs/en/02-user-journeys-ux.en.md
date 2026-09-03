@@ -18,7 +18,7 @@ Design principles: every role's next step is always exactly one action; queriers
 2. Pastes a post link or forwards a message
 3. Bot replies with a context card (Flex Message): original source, first-seen time, same-content account count, snapshot links
 4. Two buttons at card bottom: "Helpful" / "Not helpful" (postback, stays in chat)
-5. After voting: thanks + optional "daily queue" opt-in (arbiter conversion)
+5. After voting: thanks. On the day of following, the user already receives today's queue and a "send me the queue daily for three days" invitation; afterwards the rich-menu "today's queue" serves it on demand (D-014)
 
 When no card can be generated (cluster not formed, non-public link): reply "no coordination signals found" + a generic literacy tip. Never reply with nothing.
 

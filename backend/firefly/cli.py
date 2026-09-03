@@ -5,6 +5,7 @@
   python -m firefly.cli seed-domains     # 由 config/domain_signals.yaml 匯入網域訊號(留痕不硬刪)
   python -m firefly.cli recompute        # 橋接引擎批次重算(每小時 cron;Phase A 不裁決)
   python -m firefly.cli poll-mentions    # Threads mentions 輪詢(備援路線)
+  python -m firefly.cli line-onboarding-push [--force]   # D-014 引導期推播(每日一次;排程器每 5 分鐘呼叫)
 """
 from __future__ import annotations
 
@@ -70,7 +71,16 @@ async def _poll_mentions() -> None:
     print(await poll_mentions())
 
 
-COMMANDS = {"maintenance": _maintenance, "seed-domains": _seed_domains, "recompute": _recompute, "poll-mentions": _poll_mentions}
+async def _line_onboarding_push(force: bool = False) -> None:
+    from .bots.line_client import get_line_client
+    from .bots.line_onboarding import run_daily_push
+
+    async with get_sessionmaker()() as s:
+        print(await run_daily_push(s, get_line_client(), force=force))
+        await s.commit()
+
+
+COMMANDS = {"maintenance": _maintenance, "seed-domains": _seed_domains, "recompute": _recompute, "poll-mentions": _poll_mentions, "line-onboarding-push": _line_onboarding_push}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -78,6 +88,9 @@ def main(argv: list[str] | None = None) -> int:
     if not argv or argv[0] not in COMMANDS:
         print(__doc__)
         return 2
+    if argv[0] == "line-onboarding-push":
+        asyncio.run(_line_onboarding_push(force="--force" in argv[1:]))
+        return 0
     asyncio.run(COMMANDS[argv[0]]())
     return 0
 

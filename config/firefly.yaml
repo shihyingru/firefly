@@ -84,7 +84,11 @@ threads:
 
 line:
   enabled: true
-  daily_queue_push_enabled: false     # 「明日佇列」唯一 push 場景 / the only push scenario
+  onboarding_push_enabled: false      # D-014:引導期 push(唯一 push 場景)。文件 10 公示期結束後才可改 true
+  onboarding_push_days: 3             # 引導期天數;加密 userId 只存 Redis,TTL = 天數 × 24h + 1h
+  onboarding_push_hour_local: 20      # 每日推播時刻(Asia/Taipei)
+  onboarding_push_daily_cap: 100      # 每日推播人數上限(LINE 免費則數保護);超量沉默
+  queue_size: 5                       # 每日 5 張(文件 02)
 
 cors:
   open_data_origins: ["*"]            # 開放資料端點 GET / open-data GET endpoints

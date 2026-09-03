@@ -57,3 +57,11 @@ export FIREFLY_INLINE_JOBS=1 FIREFLY_SOURCE_ADAPTER=mock FIREFLY_EMBEDDER=hash
 ## 全容器化 / Containers
 
 `cp .env.example .env && docker compose up --build` → db、redis、migrate、api、worker、scheduler 六個服務;`curl localhost:8000/healthz`。
+
+## 1.3b LINE 引導期推播與自取(D-014)
+
+1. 產生金鑰:`python -c "from cryptography.fernet import Fernet;print(Fernet.generate_key().decode())"` → 填入 `.env` 的 `LINE_PUSH_ENC_KEY`。
+2. `pytest -q tests/test_line_onboarding.py` → 第 0 天 reply、同意後只有加密值進 Redis、三天推播後刪除、封鎖即刪、每日上限、旗標關閉時無邀請。
+3. 富選單:LINE Official Account Manager → 聊天室相關 → 圖文選單 → 新增按鈕,動作類型「Postback」,資料填 `queue:today`,顯示文字「今日佇列」。
+4. 手動觸發推播(需 `line.onboarding_push_enabled: true` 且已同意):`python -m firefly.cli line-onboarding-push --force`。
+5. 隱私守衛:`redis-cli --scan --pattern 'line:onboard:*'` 只看到加密字串;`psql -c "select count(*) from contributor where origin_key_hash like 'U%'"` 為 0。
