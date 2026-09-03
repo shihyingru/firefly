@@ -1,0 +1,16 @@
+# Stage 1 排版指紋規則庫(文件 04)。規則開源、附出處;命中只列證據,不下結論。
+# Stage 1 formatting-fingerprint rules (doc 04). Open, with citations; a hit is evidence, never a verdict.
+version: 1
+rules:
+  - id: short_lines_emoji_hashtag_tail
+    lang: any
+    description_zh: N 行短句 + emoji + 尾行 hashtag
+    description_en: N short lines + emoji + trailing hashtag line
+    source: "公開農場排版觀察(Doublethink Lab 2025 報告)/ published content-farm formatting observations"
+    params: { min_lines: 4, max_chars_per_line: 30, require_emoji: true, trailing_hashtag: true }
+  - id: repeated_link_only
+    lang: any
+    description_zh: 內文極短且僅含一個外部連結
+    description_en: Near-empty body containing a single external link
+    source: "本專案觀測 / project observation"
+    params: { max_text_chars: 20, exact_links: 1 }

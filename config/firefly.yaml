@@ -1,0 +1,73 @@
+# 螢火 Firefly 可調參數(版本化設定檔,文件 12 透明要求)
+# Firefly tunable parameters (versioned config, doc 12 transparency requirement)
+#
+# 規則 / Rules:
+# - 任何參數變更走公開 PR,合併前公示 7 天(文件 10)
+#   Every change goes through a public PR with a 7-day notice (doc 10)
+# - 標記 TODO(calibrate) 的值為初始值,尚未實測校準,勿視為定值
+#   Values marked TODO(calibrate) are initial values pending empirical calibration
+version: 1
+
+clustering:
+  theta_join: 0.92          # TODO(calibrate) 歸入既有叢集的 cosine 相似度門檻 / cosine threshold to join a cluster
+  k_min_posts: 3            # TODO(calibrate) 成簇門檻 K / minimum isolated posts to form a cluster
+  dormant_days: 30          # 無新增貼文後轉 dormant / days without new posts before dormant
+
+embedding:
+  model: intfloat/multilingual-e5-base   # D-012
+  dim: 768                                # 必須與 model 一致;改動需重建索引 / must match model; changing requires reindex
+  query_prefix: "query: "                 # e5 慣例 / e5 convention
+  passage_prefix: "passage: "
+
+bridging:
+  theta_helpful: 0.40       # TODO(calibrate) 顯示閾值 i_c / display threshold; meaningful only with the lambdas below (D-013)
+  hysteresis: 0.05          # 退回 candidate 的遲滯帶 / hysteresis band before demotion
+  n_min_votes: 5            # TODO(calibrate) 最低有效投票數 / minimum valid votes
+  lambda_intercept: 0.15    # TODO(calibrate) 截距正則化(Community Notes 公開值)/ intercept regularization
+  lambda_factor: 0.03       # TODO(calibrate) 因子正則化 / factor regularization
+  factor_dim: 1             # 立場向量維度 / stance vector dimension
+  phase_a_max_active_arbiters: 100   # TODO(calibrate) 低於此值維持 Phase A / stay in Phase A below this
+  recompute_interval_minutes: 60
+  burst_zscore_threshold: 3.0        # TODO(calibrate) 突發灌票 z-score / burst-vote detection
+  burst_window_minutes: 60
+
+eligibility:                # D-009:僅計數,不存任何 URL / count only, never URLs
+  min_lookups: 3            # TODO(calibrate)
+  min_account_age_hours: 24 # TODO(calibrate)
+
+card:
+  sample_excerpt_max_chars: 140   # D-002
+  llm_enabled: false              # D-001:預設關閉 / off by default
+  max_validation_retries: 3       # 連續驗證失敗進人工佇列 / to human review after this many failures
+
+ratelimit:
+  anonymous_per_hour: 60
+  contributor_per_hour: 300
+  window_seconds: 3600
+  ip_retention_seconds: 86400     # 文件 08:IP 僅防濫用 24h 滾動窗口 / doc 08: IP kept ≤ 24h for abuse control only
+
+queue:
+  default_limit: 5
+  max_limit: 20
+  strategy: phase_a_fewest_votes   # D-010;Phase B 改 spectrum_balance / Phase B switches to spectrum_balance
+
+ingestion:                  # D-006
+  keyword_search_daily_budget: 1700   # 官方額度 2200/24h 留 20% 餘裕 / official 2200 per 24h minus 20% margin
+  sibling_search_per_lookup: 1        # 策略 A 每次查詢的搜尋次數 / strategy A searches per lookup
+  tag_patrol_interval_minutes: 60     # 策略 B / strategy B
+  tags: []                            # 版本化標籤清單 / versioned tag list
+  domain_lookback_interval_minutes: 360   # 策略 C / strategy C
+
+threads:
+  enabled: false                      # feature flag(文件 7.2 風險開關)/ kill switch
+  daily_reply_cap: 200                # 官方 1000/日,取保守值 / conservative vs official 1000/day
+  quota_margin: 0.2
+  mention_poll_interval_seconds: 300
+
+line:
+  enabled: true
+  daily_queue_push_enabled: false     # 「明日佇列」唯一 push 場景 / the only push scenario
+
+cors:
+  open_data_origins: ["*"]            # 開放資料端點 GET / open-data GET endpoints
+  write_origins: []                   # 寫入端點白名單 / write endpoints allowlist

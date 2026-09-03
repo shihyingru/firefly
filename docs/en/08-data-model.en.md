@@ -44,6 +44,9 @@ contributor_id FK, card_id FK, helpful bool, created_at, weight (<1 after down-w
 ### domain_signal
 domain, source_list (provenance, e.g. DTL report), list_version, evidence_url, added_at, removed_at nullable (appeal removals leave traces, no hard delete)
 
+### cluster_flag (added in implementation)
+cluster_id FK, contributor_id FK, kind (not_in_cluster/additional_source), post_url nullable, note, created_at — named-contributor clustering-error flags and additional sources (doc 06 /clusters/{id}/flags). Individual rows are **not public**; the audit log records only which cluster was flagged and the kind
+
 ### audit_log
 entity_type, entity_id, event, payload (jsonb), created_at — card state changes, prompts/outputs, parameter changes all included; **entire table public**
 

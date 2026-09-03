@@ -79,9 +79,42 @@ Stop and discuss rather than working around:
 
 ---
 
+## 快速上手 / Quickstart(Wave 1.1:後端核心 / backend core)
+
+```bash
+cp .env.example .env            # 填入密鑰 / fill in secrets
+docker compose up --build       # db(pgvector)+ redis + migrate + api + worker
+curl localhost:8000/healthz
+```
+
+不用 Docker 的本機開發 / Local development without Docker:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e "backend[dev]"
+export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_URL=redis://127.0.0.1:6379/0
+(cd backend && ../.venv/bin/alembic upgrade head)
+(cd backend && ../.venv/bin/uvicorn firefly.main:app --reload)
+```
+
+測試(需本機 PostgreSQL+pgvector 與 Redis)/ Tests (need local PostgreSQL+pgvector and Redis):
+
+```bash
+(cd backend && ../.venv/bin/python -m pytest -q)
+```
+
+示範資料 / Demo data:`FIREFLY_INLINE_JOBS=1 .venv/bin/python scripts/seed_demo.py`
+
+| 路徑 / Path | 內容 / What |
+|---|---|
+| `config/firefly.yaml` | 所有可調參數(θ_join、θ_helpful、K、N_min、λ…),版本化、公開 / all tunables, versioned |
+| `backend/firefly/models.py` | 文件 08 資料模型 / doc-08 data model |
+| `backend/firefly/api/routes.py` | 文件 06 端點 / doc-06 endpoints |
+| `backend/tests/test_privacy_guard.py` | 「明確不存」守衛 / never-stored guard |
+| `docs/zh-TW/17-實作決議紀錄.md` | 實作決議 D-001… / decision record |
+
 ## Status
 
-Design phase. Implementation has not started. See doc 16 for the implementation handoff prompt.
+Wave 1 in progress: 1.1 backend core done; 1.2 AI pipeline next. See doc 16 for the handoff prompt and doc 17 for decisions.
 
 ## License
 

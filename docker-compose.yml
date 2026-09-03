@@ -1,0 +1,47 @@
+# 螢火 Firefly — 單 VPS 全容器化(文件 03)/ single-VPS, fully containerized (doc 03)
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: firefly
+      POSTGRES_PASSWORD: firefly
+      POSTGRES_DB: firefly
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U firefly"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+  migrate:
+    build: ./backend
+    env_file: .env
+    command: ["alembic", "upgrade", "head"]
+    volumes: [./config:/app/config:ro]
+    depends_on:
+      db: { condition: service_healthy }
+  api:
+    build: ./backend
+    env_file: .env
+    command: ["uvicorn", "firefly.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["8000:8000"]
+    volumes: [./config:/app/config:ro]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+  worker:
+    build: ./backend
+    env_file: .env
+    command: ["rq", "worker", "--url", "redis://redis:6379/0", "firefly"]
+    volumes: [./config:/app/config:ro]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+volumes:
+  pgdata:

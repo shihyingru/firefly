@@ -1,0 +1,9 @@
+# 網域訊號種子清單(文件 09:僅 A/B 級來源)。留痕不硬刪:移除填 removed_at。
+# Domain-signal seed list (doc 09: A/B-grade sources only). Never hard-delete: set removed_at.
+version: 0
+entries: []
+# 範例 / example:
+# - domain: example-farm.tld
+#   source_list: "Doublethink Lab, <report title>"
+#   list_version: "2025-06"
+#   evidence_url: https://…
