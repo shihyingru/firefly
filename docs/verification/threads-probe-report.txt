@@ -1,0 +1,72 @@
+=== 摘要 / Summary ===
+A oEmbed: status=400 keys=['error'] timestamp_like=[] html_time_tag=False
+B GET /{id} (not owned): status=400 fields=None err={'message': "Unsupported get request. Object with ID '3818916778798227125' does not exist, cannot be loaded due to missing permissions, or does not support this operation", 'type': 'THApiException', 'code': 100, 'error_subcode': 33, 'fbtrace_id': 'ALHoNVus9DnwNGo0xyATxla'}
+C1_keyword_search: status=200 count=0 fields=[] err=None
+C2_tag_search: status=200 count=0 fields=[] err=None
+D mentions: status=200 count=0 err=None
+E public page (reference only): status=200 og_description=yes taken_at=False
+
+=== JSON 報告(請貼回)/ JSON report (paste back) ===
+{
+  "A_oembed": {
+    "status": 400,
+    "error": null,
+    "keys": [
+      "error"
+    ],
+    "html_len": 0,
+    "html_has_time_tag": false,
+    "html_visible_text_sample": "",
+    "timestamp_like_fields": [],
+    "body_head": "{\"error\":{\"message\":\"Application does not have permission for this action\",\"type\":\"OAuthException\",\"code\":10,\"error_subcode\":4279067,\"is_transient\":false,\"error_user_title\":\"App Does Not Have Sufficient Access Tier\",\"error_user_msg\":\"The requested data cannot be accessed with the current app data ac"
+  },
+  "B_media_by_id_not_owned": {
+    "decoded_id": 3818916778798227125,
+    "status": 400,
+    "error": null,
+    "api_error": {
+      "message": "Unsupported get request. Object with ID '3818916778798227125' does not exist, cannot be loaded due to missing permissions, or does not support this operation",
+      "type": "THApiException",
+      "code": 100,
+      "error_subcode": 33,
+      "fbtrace_id": "ALHoNVus9DnwNGo0xyATxla"
+    }
+  },
+  "C1_keyword_search": {
+    "q": "台灣",
+    "search_mode": null,
+    "status": 200,
+    "error": null,
+    "count": 0,
+    "fields_present_union": [],
+    "distinct_usernames": 0,
+    "sample": []
+  },
+  "C2_tag_search": {
+    "q": "新聞",
+    "search_mode": "TAG",
+    "status": 200,
+    "error": null,
+    "count": 0,
+    "fields_present_union": [],
+    "distinct_usernames": 0,
+    "sample": []
+  },
+  "D_mentions_polling": {
+    "status": 200,
+    "error": null,
+    "count": 0,
+    "fields_present_union": []
+  },
+  "E_public_page_reference_only": {
+    "status": 200,
+    "error": null,
+    "bytes": 574381,
+    "login_wall": false,
+    "og_description": "&#x1f4e2; Threads API update\n\nJanuary 26, 2026\n&#xb7; Reply and mention webhooks can now return is_verified and profile_picture_url when applicable. See Webhooks for more information.\n\nFor more inform",
+    "has_taken_at": false
+  },
+  "F_webhook": {
+    "note": "Webhook 需公開 HTTPS 端點與 App Dashboard 訂閱,無法離線測試。步驟:1) App Dashboard → Webhooks → Threads → 訂閱 mentions、replies;2) 指向 /v1/threads/webhook(後端實作後提供);3) 用另一帳號 @ 測試帳號,觀察是否收到事件。/ Needs a public HTTPS endpoint and a dashboard subscription; cannot be tested offline."
+  }
+}
