@@ -43,5 +43,17 @@ services:
     depends_on:
       migrate: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
+  scheduler:
+    # 簡易排程(單 VPS):每小時橋接重算與維護,每 5 分鐘 Threads mentions 輪詢 / simple single-VPS scheduler
+    build: ./backend
+    env_file: .env
+    volumes: [./config:/app/config:ro]
+    command: >
+      sh -c 'i=0; while true; do
+        if [ $$((i % 12)) -eq 0 ]; then python -m firefly.cli recompute; python -m firefly.cli maintenance; fi;
+        python -m firefly.cli poll-mentions; i=$$((i+1)); sleep 300; done'
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
 volumes:
   pgdata:

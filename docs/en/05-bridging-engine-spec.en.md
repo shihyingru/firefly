@@ -39,6 +39,7 @@ While contributors are too few to estimate stance vectors:
 - Sybil: behaviorally identical account groups collapse into one stance vector during factorization; vote-stuffing gains are sublinear
 - Burst detection: abnormal per-card vote velocity (z-score) → that window's votes down-weighted and flagged for audit
 - Contributor eligibility: voting requires accumulated organic query history (blocks pure registration bots); no real names required
+- Rater pruning (added in implementation, D-015): handles with fewer than min_votes_per_rater votes are excluded from factorization (Community Notes convention); single-card brigading handles therefore carry near-zero weight
 - All down-weighting/flagging rules are open source; parameter changes go through public PRs
 
 ## Re-scoring Cadence
