@@ -9,6 +9,8 @@
 - Actions: fetch text content, author's public handle, timestamp; submit to Wayback Machine in parallel
 - Output: PostSnapshot (with archive_url)
 - Failure: non-public/deleted → mark unfetchable; tell the querier "content could not be retrieved"
+- **Threads source limits (verified 2026-09-03, doc 17)**: the Threads API does not allow reading another user's post by ID. For a single URL the only API path is oEmbed (requires App Review). oEmbed may not carry the post time → posted_at is nullable. Threads public web pages are never scraped (doc 13 red line)
+- **Ingestion adapters (how clusters grow)**: A. lookup-triggered sibling search — extract keywords from the submitted post and call keyword_search for recent public posts; B. tag patrol — scheduled TAG searches over a versioned tag list; C. domain look-back — keyword_search on domain_signal domain strings. All via the official API, public posts only; keyword/tag lists are versioned; keep a 20% quota margin
 
 ## Stage 1: Fingerprint Detection
 

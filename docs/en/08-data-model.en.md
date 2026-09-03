@@ -13,10 +13,10 @@
 | platform | enum | threads/facebook/other |
 | author_handle | text | public platform handle |
 | content_text | text | text at fetch time |
-| posted_at | timestamptz | platform-displayed time |
+| posted_at | timestamptz nullable | platform-displayed time; null when the source does not provide it (e.g. oEmbed); timing fingerprints use non-null values only |
 | fetched_at | timestamptz | |
 | archive_url | text | Wayback snapshot |
-| embedding | vector(768) | pgvector |
+| embedding | vector(N) | pgvector; N set by config embedding.dim, initially 768 (multilingual-e5-base) |
 | cluster_id | uuid FK nullable | |
 
 ### cluster
@@ -34,6 +34,7 @@ id, cluster_id FK, version, fields (jsonb, the seven doc-04 whitelist fields onl
 | named_profile | nullable: self-chosen nickname (named contributors) |
 | stance_vector | float[] (bridging-engine output; scoring only, never exposed) |
 | created_at / last_active_at | |
+| lookup_count / first_lookup_at | integer count and first-lookup time, used only for the voting eligibility threshold (doc 05). **Never** stores looked-up URLs, clusters, or time series |
 
 **Explicitly never stored**: IP (abuse-prevention rolling window only, deleted after 24h), nationality, real names, contact info, any raw platform identifiers.
 

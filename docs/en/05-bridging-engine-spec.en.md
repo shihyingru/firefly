@@ -30,7 +30,7 @@ Solved by regularized alternating least squares or SGD; dimensionality starts at
 
 While contributors are too few to estimate stance vectors:
 
-1. Phase A (< 100 active arbiters): no display decisions; all cards run as "query-visible + awaiting-arbitration label"; vote matrix accumulates
+1. Phase A (< 100 active arbiters): no display decisions; all cards run as "query-visible + awaiting-arbitration label"; vote matrix accumulates; queue uses "fewest votes first" (doc 06)
 2. Phase B: full bridging scoring activates once matrix density suffices; all Phase A votes retained for training
 3. Spectrum diversity metric: bimodal coverage of the stance-vector distribution; published on the dashboard; when unmet, cards display "arbitration spectrum not yet balanced"
 

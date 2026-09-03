@@ -38,6 +38,7 @@ AI 偵測協同性造假行為並起草「脈絡卡」,人類一鍵仲裁,橋接
 | 14 | [風險與威脅模型](docs/zh-TW/14-風險與威脅模型.md) | |
 | 15 | [行銷與內容自動化準則](docs/zh-TW/15-行銷與內容自動化準則.md) | |
 | 16 | [Claude Code 交付 Prompt](docs/16-claude-code-handoff-prompt.md) | 實作起點 |
+| 17 | [實作決議紀錄](docs/zh-TW/17-實作決議紀錄.md) | 實作階段的設計決議(append-only) |
 
 ### 硬約束
 

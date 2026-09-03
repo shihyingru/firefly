@@ -7,8 +7,9 @@
 - LINE Messaging API; webhook served by the main backend (FastAPI route)
 - Message handling: text containing a URL → extract & normalize → call /lookup; forwarded messages likewise
 - Card rendering: two-part Flex Message — summary bubble (source/time/account count) + button row (helpful/not-helpful postback, "view full card" URI)
-- Voting: postback event carries card_id; server uses a one-way hash of the LINE userId as the contributor handle (no raw-userId mapping table stored)
+- Voting: postback event carries card_id; server uses a one-way hash of the LINE userId as the contributor handle (no raw-userId mapping table stored); the hash is HMAC-SHA256 with a server secret in an environment variable, rotated via runbook
 - Always reply via reply token (free); never proactive push (zero cost, zero annoyance)
+- When /lookup returns 202 (drafting): reply a "processing" message via the reply token with a "check again" button (postback carrying the original URL). No push, no waiting
 - "Daily queue": rich-menu toggle; opted-in users get 5 cards/day via push (the only push scenario; small volume)
 
 ## 7.2 Threads Reply Bot (Wave 1, technical-validation item)

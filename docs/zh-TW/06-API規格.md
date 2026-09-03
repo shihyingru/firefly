@@ -12,6 +12,13 @@
 
 ## 消費端端點
 
+### POST /devices
+核發匿名裝置代號(決議 2026-09-03,見文件 17)。
+```json
+req: {}                                   // 不帶任何裝置資訊
+res 201: { "device_token": "opaque…" }   // 伺服端僅存 token 雜湊與建立時間
+```
+
 ### POST /lookup
 查詢連結,回脈絡卡或狀態。
 ```json
@@ -31,7 +38,7 @@ res: { "accepted": true }        // 冪等:同代號重複投票覆寫
 ```
 
 ### GET /queue?limit=5
-仲裁佇列(需貢獻者 token)。後端按光譜平衡策略出題。
+仲裁佇列(需貢獻者 token)。Phase B 後端按光譜平衡策略出題。Phase A(無立場向量)改用操作性策略:排除該貢獻者已投過的卡,有效投票數最少的 candidate 卡優先,同數隨機(決議 2026-09-03)。
 
 ### POST /clusters/{id}/flags
 具名貢獻者標記聚類錯誤或提交補充出處。

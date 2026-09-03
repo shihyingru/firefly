@@ -12,6 +12,13 @@
 
 ## Consumer Endpoints
 
+### POST /devices
+Issues an anonymous device handle (decision 2026-09-03, see doc 17).
+```json
+req: {}                                   // carries no device information
+res 201: { "device_token": "opaque…" }   // server stores only the token hash and creation time
+```
+
 ### POST /lookup
 Look up a link; returns a context card or status.
 ```json
@@ -31,7 +38,7 @@ res: { "accepted": true }        // idempotent: same handle re-voting overwrites
 ```
 
 ### GET /queue?limit=5
-Arbitration queue (contributor token required). Backend selects per spectrum-balancing strategy.
+Arbitration queue (contributor token required). In Phase B the backend selects per spectrum-balancing strategy. In Phase A (no stance vectors) it uses an operational strategy: exclude cards this contributor already voted on, prefer candidate cards with the fewest valid votes, random among ties (decision 2026-09-03).
 
 ### POST /clusters/{id}/flags
 Named contributors flag clustering errors or submit supplementary sources.
