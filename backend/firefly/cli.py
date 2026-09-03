@@ -3,6 +3,8 @@
 
   python -m firefly.cli maintenance      # 叢集生命週期 + 標籤巡檢 + 網域回查(以 cron 每小時執行)
   python -m firefly.cli seed-domains     # 由 config/domain_signals.yaml 匯入網域訊號(留痕不硬刪)
+  python -m firefly.cli recompute        # 橋接引擎批次重算(每小時 cron;Phase A 不裁決)
+  python -m firefly.cli poll-mentions    # Threads mentions 輪詢(備援路線)
 """
 from __future__ import annotations
 
@@ -54,12 +56,29 @@ async def _seed_domains() -> None:
         print("added", added)
 
 
+async def _recompute() -> None:
+    from .bridging.engine import recompute
+
+    async with get_sessionmaker()() as s:
+        print(await recompute(s))
+        await s.commit()
+
+
+async def _poll_mentions() -> None:
+    from .bots.threads import poll_mentions
+
+    print(await poll_mentions())
+
+
+COMMANDS = {"maintenance": _maintenance, "seed-domains": _seed_domains, "recompute": _recompute, "poll-mentions": _poll_mentions}
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
-    if not argv or argv[0] not in ("maintenance", "seed-domains"):
+    if not argv or argv[0] not in COMMANDS:
         print(__doc__)
         return 2
-    asyncio.run(_maintenance() if argv[0] == "maintenance" else _seed_domains())
+    asyncio.run(COMMANDS[argv[0]]())
     return 0
 
 

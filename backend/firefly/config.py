@@ -40,6 +40,7 @@ class BridgingCfg(BaseModel):
     lambda_intercept: float = 0.15
     lambda_factor: float = 0.03
     factor_dim: int = 1
+    min_votes_per_rater: int = 2
     phase_a_max_active_arbiters: int = 100
     recompute_interval_minutes: int = 60
     burst_zscore_threshold: float = 3.0

@@ -28,6 +28,7 @@ bridging:
   lambda_intercept: 0.15    # TODO(calibrate) 截距正則化(Community Notes 公開值)/ intercept regularization
   lambda_factor: 0.03       # TODO(calibrate) 因子正則化 / factor regularization
   factor_dim: 1             # 立場向量維度 / stance vector dimension
+  min_votes_per_rater: 2    # TODO(calibrate) 投票者進入分解的最低投票數(Community Notes 用 10)/ min votes per rater to enter factorization
   phase_a_max_active_arbiters: 100   # TODO(calibrate) 低於此值維持 Phase A / stay in Phase A below this
   recompute_interval_minutes: 60
   burst_zscore_threshold: 3.0        # TODO(calibrate) 突發灌票 z-score / burst-vote detection
