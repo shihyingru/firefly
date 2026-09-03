@@ -57,6 +57,7 @@
 - **pgvector in one DB vs dedicated vector store**: former. Sufficient at 10^5–10^6 posts; one less operational surface
 - **Batch re-scoring vs realtime**: batch. Bridging requires global matrix factorization; realtime complexity isn't worth it
 - **Self-hosted LLM vs API**: API. Once-per-cluster volume can't justify self-hosting; transparency achieved by logging prompts/outputs
+- **Stage 3 deterministic-first (2026-09-03)**: whitelist fields are computed by code; the LLM only proposes original_source from a closed candidate set and is off by default. Rationale: smaller injection/hallucination surface; every card is 100% replayable from data
 - **Platform dependency risk**: Threads/LINE can both be cut off; the share-target app is the fully self-controlled fallback entry, hence mandatory in Wave 2
 
 ## Expansion Path

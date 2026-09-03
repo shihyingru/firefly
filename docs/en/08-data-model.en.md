@@ -23,7 +23,7 @@
 id, status (forming/active/dormant/archived), created_at, post_count, account_count, signal_summary (jsonb: raw data of the three fingerprint families), current_card_id
 
 ### context_card
-id, cluster_id FK, version, fields (jsonb, whitelist fields only), llm_model, prompt_ref (audit-log pointer), validation_passed_at, state (draft/candidate/displayed/not_displayed), quality_score (i_c), vote_count
+id, cluster_id FK, version, fields (jsonb, the seven doc-04 whitelist fields only, incl. sample_excerpt), llm_model (nullable; empty when the LLM step is off), prompt_ref (audit-log pointer, nullable), validation_passed_at, state (draft/candidate/displayed/not_displayed), quality_score (i_c), vote_count
 
 ### contributor
 | Field | Notes |

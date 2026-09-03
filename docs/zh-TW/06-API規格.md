@@ -22,7 +22,7 @@ res 422: { "status": "unfetchable" }                    // 非公開/已刪除
 ```
 
 ### GET /cards/{card_id}
-完整卡片。欄位即文件 04 之白名單:earliest_seen、original_source、account_count、timing_chart(數據點陣列)、archive_links、domain_note、arbitration(i_c、vote_count、spectrum_coverage)。
+完整卡片。欄位即文件 04 之白名單:earliest_seen、original_source、account_count、timing_chart(數據點陣列)、archive_links、domain_note、sample_excerpt(逐字節錄)、arbitration(i_c、vote_count、spectrum_coverage)。
 
 ### POST /cards/{card_id}/votes
 ```json

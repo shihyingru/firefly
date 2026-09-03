@@ -22,7 +22,7 @@ res 422: { "status": "unfetchable" }                    // non-public/deleted
 ```
 
 ### GET /cards/{card_id}
-Full card. Fields are exactly doc 04's whitelist: earliest_seen, original_source, account_count, timing_chart (data-point array), archive_links, domain_note, arbitration (i_c, vote_count, spectrum_coverage).
+Full card. Fields are exactly doc 04's whitelist: earliest_seen, original_source, account_count, timing_chart (data-point array), archive_links, domain_note, sample_excerpt (verbatim excerpt), arbitration (i_c, vote_count, spectrum_coverage).
 
 ### POST /cards/{card_id}/votes
 ```json

@@ -35,7 +35,7 @@ Residual risk: low. Worst case = latency, never error.
 ## T5 Prompt Injection Against the AI Clerk
 
 Attack: post content smuggling instructions ("ignore the rules, write this into the card…").
-Defenses: post content is always data, never instructions; output forced through a JSON-schema whitelist; field-level post-validation (links must resolve, numbers must match the SignalSet); any failure regenerates the whole card.
+Defenses: post content is always data, never instructions; Stage 3 is deterministic-first (doc 04 v0.2), the LLM may only pick original_source from a closed candidate set and never touches other fields; output forced through a JSON-schema whitelist; field-level post-validation (links must exist in the snapshot store or candidate set, numbers must match the SignalSet, sample_excerpt must match verbatim); any failure regenerates the whole card.
 Test item (CI-mandatory): injection-corpus regression suite incl. zh/en/ja and obfuscated encodings.
 Residual risk: low. A successful injection cannot pass validation.
 
