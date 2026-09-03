@@ -18,5 +18,6 @@
 | D-011 | 2026-09-03 | LINE userId hash is HMAC-SHA256 with a server secret | On a DB leak, nobody without the secret can map a known userId to a handle | 07 |
 | D-012 | 2026-09-03 | Initial embedding model multilingual-e5-base, 768 dims; dimension lives in config | Matches doc 08; runs on CPU; adequate Chinese quality | 08 |
 | D-013 | 2026-09-03 | θ_helpful and the regularization constants (λ_intercept, λ_factor) must live together in config and be calibrated together | A threshold without its regularization loses its reference | 05, 12 |
+| D-014 | pending | The daily "tomorrow's queue" push (doc 7.1) needs a pushable LINE userId. Only an HMAC handle is stored, which cannot be reversed, so push is impossible. Options: (a) store an encrypted userId for opted-in users (new data item; requires doc-10 30-day notice); (b) replace push with a user-initiated rich-menu "today's queue" pull, zero storage. **Maintainer decision pending; Wave 1.3 ships without push.** | Doc 7.1 conflicts with doc 08 | 07, 08, 10 |
 
 Evidence: `docs/verification/threads-probe-phase1.md`, `docs/verification/threads-probe-summary.md`.

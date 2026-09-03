@@ -15,6 +15,7 @@ from starlette.middleware.cors import CORSMiddleware
 from . import __version__
 from .api.open_data import router as open_router
 from .api.routes import router as v1_router
+from .bots.line import router as line_router
 from .config import get_config
 
 
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(v1_router)
     app.include_router(open_router)
+    app.include_router(line_router)
 
     @app.exception_handler(StarletteHTTPException)
     async def http_error(_: Request, exc: StarletteHTTPException):

@@ -112,6 +112,7 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 | `backend/firefly/models.py` | 文件 08 資料模型 / doc-08 data model |
 | `backend/firefly/api/routes.py` | 文件 06 端點 / doc-06 endpoints |
 | `backend/tests/test_privacy_guard.py` | 「明確不存」守衛 / never-stored guard |
+| `backend/firefly/bots/line.py` | LINE Bot webhook(文件 7.1)/ LINE bot webhook |
 | `backend/firefly/pipeline/` | Stage 0-3:adapters、stage1_fingerprint、stage2_cluster、stage3_card、card_schema、llm、ingest |
 | `backend/tests/data/injection_corpus.jsonl` | 文件 14 T5 注入迴歸語料(中/英/日/混淆)/ injection corpus |
 | `config/fingerprint_rules.yaml`、`config/domain_signals.yaml` | 排版規則庫、網域訊號種子 / rule library, domain seeds |
@@ -119,7 +120,7 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 
 ## Status
 
-Wave 1 in progress: 1.1 backend core and 1.2 AI pipeline done; 1.3 LINE bot next. See doc 16 for the handoff prompt and doc 17 for decisions.
+Wave 1 in progress: 1.1 backend core, 1.2 AI pipeline, 1.3 LINE bot done; 1.4 Threads bot next. See doc 16 for the handoff prompt and doc 17 for decisions.
 
 ## License
 
