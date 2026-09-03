@@ -47,3 +47,17 @@
 - Dockerfile 加入 e5 模型與 `ml` extra;CI 加 e5 煙霧測試(選用)。
 - 校準工具:從 audit log 回放,產出 θ_join / θ_helpful 的靈敏度報告。
 - Wave 2 各項(依 B8 決定的順序)。
+
+## D. 交接給其他模型 / Hand-off prompt for a new session
+
+A 段是人工作業,不需要模型。B 段是你的決定,任何模型都只能提供建議。C 段可交給較省用量的模型。建議:runbook、儀表板、Dockerfile、文件更新用 Sonnet;橋接校準工具與 Wave 2 App 架構用 Opus。
+
+新工作階段的起始 prompt(複製即可):
+
+```
+你是「螢火 Firefly」專案的實作工程師。先完整閱讀 docs/zh-TW/01-專案概述-v2.md,
+再讀 docs/zh-TW/17-實作決議紀錄.md(所有已定案決議,不得推翻)、docs/TODO-maintainer.md、
+docs/verification/wave1-verification.md。硬約束見文件 04、08、10、14;遇實作困難停下回報,不得自行變通。
+Wave 1 已完成於 backend/(75 個測試,cd backend && pytest -q 必須全綠)。
+本次任務:<填入 C 段的一項>。完成後附驗證步驟,程式註解雙語,commit 訊息不含模型名稱。
+```
