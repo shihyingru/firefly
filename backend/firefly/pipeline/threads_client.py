@@ -20,6 +20,7 @@ from ..services.redis_client import get_sync_redis
 
 GRAPH = "https://graph.threads.net/v1.0"
 MEDIA_FIELDS = "id,text,username,timestamp,permalink,shortcode,topic_tag,link_attachment_url,media_type"
+MENTION_FIELDS = MEDIA_FIELDS + ",replied_to,root_post"
 
 
 @dataclass
@@ -30,12 +31,16 @@ class ThreadsMedia:
     timestamp: datetime | None
     permalink: str | None
     link_attachment_url: str | None = None
+    replied_to_id: str | None = None
+    root_post_id: str | None = None
 
 
 class ThreadsAPI(Protocol):
     def oembed(self, url: str) -> dict | None: ...
     def keyword_search(self, q: str, mode: str | None = None, limit: int = 25) -> list[ThreadsMedia]: ...
     def mentions(self, limit: int = 25) -> list[ThreadsMedia]: ...
+    def media_permalink(self, media_id: str) -> str | None: ...
+    def reply(self, reply_to_id: str, text: str) -> str | None: ...
 
 
 def _parse_ts(s: str | None) -> datetime | None:
@@ -48,7 +53,11 @@ def _parse_ts(s: str | None) -> datetime | None:
 
 
 def _media(d: dict) -> ThreadsMedia:
-    return ThreadsMedia(str(d.get("id")), d.get("text") or "", d.get("username"), _parse_ts(d.get("timestamp")), d.get("permalink"), d.get("link_attachment_url"))
+    rt, rp = d.get("replied_to") or {}, d.get("root_post") or {}
+    return ThreadsMedia(
+        str(d.get("id")), d.get("text") or "", d.get("username"), _parse_ts(d.get("timestamp")), d.get("permalink"),
+        d.get("link_attachment_url"), rt.get("id") if isinstance(rt, dict) else None, rp.get("id") if isinstance(rp, dict) else None,
+    )
 
 
 class SearchBudget:
@@ -102,10 +111,27 @@ class HttpThreadsAPI:
     def mentions(self, limit: int = 25) -> list[ThreadsMedia]:
         if not self.user_token:
             return []
-        r = self.http.get(f"{GRAPH}/me/mentions", params={"fields": MEDIA_FIELDS, "limit": limit, "access_token": self.user_token})
+        r = self.http.get(f"{GRAPH}/me/mentions", params={"fields": MENTION_FIELDS, "limit": limit, "access_token": self.user_token})
         if r.status_code != 200:
             return []
         return [_media(d) for d in r.json().get("data", [])]
+
+    def media_permalink(self, media_id: str) -> str | None:
+        """母貼文 permalink。非本人貼文可能無權限(2026-09-03 實測)→ None。/ may be forbidden for others' posts → None."""
+        if not self.user_token:
+            return None
+        r = self.http.get(f"{GRAPH}/{media_id}", params={"fields": "id,permalink", "access_token": self.user_token})
+        return r.json().get("permalink") if r.status_code == 200 else None
+
+    def reply(self, reply_to_id: str, text: str) -> str | None:
+        """兩步發布:建立容器(reply_to_id)→ publish。回傳新貼文 id。/ two-step publish; returns the new media id."""
+        if not self.user_token:
+            return None
+        r = self.http.post(f"{GRAPH}/me/threads", params={"media_type": "TEXT", "text": text, "reply_to_id": reply_to_id, "access_token": self.user_token})
+        if r.status_code != 200 or "id" not in r.json():
+            return None
+        r2 = self.http.post(f"{GRAPH}/me/threads_publish", params={"creation_id": r.json()["id"], "access_token": self.user_token})
+        return str(r2.json().get("id")) if r2.status_code == 200 else None
 
 
 class FakeThreadsAPI:
@@ -115,6 +141,8 @@ class FakeThreadsAPI:
         self.search_results = search_results or {}
         self.oembed_results = oembed_results or {}
         self.mentions_results = mentions_results or []
+        self.permalinks: dict[str, str] = {}
+        self.replies: list[tuple[str, str]] = []
         self.calls: list[tuple] = []
 
     def oembed(self, url: str) -> dict | None:
@@ -128,6 +156,15 @@ class FakeThreadsAPI:
     def mentions(self, limit: int = 25) -> list[ThreadsMedia]:
         self.calls.append(("mentions",))
         return self.mentions_results
+
+    def media_permalink(self, media_id: str) -> str | None:
+        self.calls.append(("permalink", media_id))
+        return self.permalinks.get(media_id)
+
+    def reply(self, reply_to_id: str, text: str) -> str | None:
+        self.calls.append(("reply", reply_to_id, text))
+        self.replies.append((reply_to_id, text))
+        return f"r{len(self.replies)}"
 
 
 _TAG_RE = re.compile(r"<[^>]+>")

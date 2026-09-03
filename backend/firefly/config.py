@@ -98,6 +98,8 @@ class ThreadsCfg(BaseModel):
     daily_reply_cap: int = 200
     quota_margin: float = 0.2
     mention_poll_interval_seconds: int = 300
+    reply_max_chars: int = 480
+    pending_retry_limit: int = 6
 
 
 class LineCfg(BaseModel):
@@ -143,6 +145,7 @@ class Settings(BaseSettings):
     threads_app_id: str = ""
     threads_app_secret: str = ""
     threads_user_token: str = ""
+    threads_webhook_verify_token: str = ""
     public_base_url: str = "http://localhost:8000"
     environment: str = "dev"
     wayback_access_key: str = ""

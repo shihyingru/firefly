@@ -78,6 +78,8 @@ threads:
   daily_reply_cap: 200                # 官方 1000/日,取保守值 / conservative vs official 1000/day
   quota_margin: 0.2
   mention_poll_interval_seconds: 300
+  reply_max_chars: 480                # 回覆 < 500 字(文件 7.2)/ reply under 500 chars
+  pending_retry_limit: 6              # 起草中的提及最多重試次數(每次輪詢一次)/ retries for mentions whose card is still drafting
 
 line:
   enabled: true
