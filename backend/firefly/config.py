@@ -22,9 +22,11 @@ class ClusteringCfg(BaseModel):
     theta_join: float = 0.92
     k_min_posts: int = 3
     dormant_days: int = 30
+    archive_after_dormant_days: int = 90
 
 
 class EmbeddingCfg(BaseModel):
+    backend: str = "e5"
     model: str = "intfloat/multilingual-e5-base"
     dim: int = 768
     query_prefix: str = "query: "
@@ -52,7 +54,22 @@ class EligibilityCfg(BaseModel):
 class CardCfg(BaseModel):
     sample_excerpt_max_chars: int = 140
     llm_enabled: bool = False
+    llm_model: str = "claude-opus-5"
     max_validation_retries: int = 3
+    redraft_thresholds: list[int] = Field(default_factory=lambda: [3, 5, 10, 20, 50, 100, 200, 500])
+    original_source_min_shared_authors: int = 2
+
+
+class Stage0Cfg(BaseModel):
+    archive_enabled: bool = False
+    archive_timeout_seconds: int = 25
+
+
+class FingerprintCfg(BaseModel):
+    sync_window_minutes: int = 60
+    chart_bucket_minutes: int = 15
+    rules_path: str = "config/fingerprint_rules.yaml"
+    domain_signals_path: str = "config/domain_signals.yaml"
 
 
 class RateLimitCfg(BaseModel):
@@ -100,6 +117,8 @@ class FireflyConfig(BaseModel):
     bridging: BridgingCfg = BridgingCfg()
     eligibility: EligibilityCfg = EligibilityCfg()
     card: CardCfg = CardCfg()
+    stage0: Stage0Cfg = Stage0Cfg()
+    fingerprint: FingerprintCfg = FingerprintCfg()
     ratelimit: RateLimitCfg = RateLimitCfg()
     queue: QueueCfg = QueueCfg()
     ingestion: IngestionCfg = IngestionCfg()
@@ -126,6 +145,9 @@ class Settings(BaseSettings):
     threads_user_token: str = ""
     public_base_url: str = "http://localhost:8000"
     environment: str = "dev"
+    wayback_access_key: str = ""
+    wayback_secret_key: str = ""
+    anthropic_api_key: str = ""  # 僅 card.llm_enabled=true 時需要 / only when card.llm_enabled
 
 
 def load_config(path: str | os.PathLike[str] | None = None) -> FireflyConfig:

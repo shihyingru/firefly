@@ -99,7 +99,7 @@ def probe_oembed(url: str, app_token: str | None):
     # 觀察:嵌入 HTML 是否含貼文文字與時間 / does the embed html carry text and a time?
     res["html_has_time_tag"] = bool(re.search(r"<time|datetime=", html))
     res["html_visible_text_sample"] = re.sub(r"<[^>]+>", " ", html)[:300].strip()
-    res["timestamp_like_fields"] = [k for k in j if re.search(r"time|date", k, re.I)] if isinstance(j, dict) else []
+    res["timestamp_like_fields"] = [k for k in j if re.search(r"time|date", k, re.IGNORECASE)] if isinstance(j, dict) else []
     if r["status"] != 200:
         res["body_head"] = (r["body"] or "")[:300]
     return res

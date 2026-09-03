@@ -65,6 +65,17 @@ def get_adapter(platform: str) -> SourceAdapter:
 
     if os.environ.get("FIREFLY_SOURCE_ADAPTER", "mock") == "mock":
         return MockAdapter()
-    from .threads_adapter import ThreadsOEmbedAdapter  # noqa: WPS433 (lazy, optional)
+    if platform == "threads":
+        from .threads_adapter import ThreadsOEmbedAdapter  # lazy import
 
-    return ThreadsOEmbedAdapter()
+        return ThreadsOEmbedAdapter()
+    return UnsupportedAdapter()
+
+
+class UnsupportedAdapter:
+    """其他平台尚無 adapter → unfetchable(沉默,不說謊)/ no adapter yet → unfetchable."""
+
+    name = "unsupported"
+
+    def fetch(self, normalized_url: str) -> FetchedPost | None:
+        return None

@@ -12,8 +12,10 @@ clustering:
   theta_join: 0.92          # TODO(calibrate) 歸入既有叢集的 cosine 相似度門檻 / cosine threshold to join a cluster
   k_min_posts: 3            # TODO(calibrate) 成簇門檻 K / minimum isolated posts to form a cluster
   dormant_days: 30          # 無新增貼文後轉 dormant / days without new posts before dormant
+  archive_after_dormant_days: 90   # dormant 後再無新增即 archived / archived after this many more days
 
 embedding:
+  backend: e5               # e5(sentence-transformers,正式)| hash(字元 n-gram,測試/無模型時的替代;審計會記錄)
   model: intfloat/multilingual-e5-base   # D-012
   dim: 768                                # 必須與 model 一致;改動需重建索引 / must match model; changing requires reindex
   query_prefix: "query: "                 # e5 慣例 / e5 convention
@@ -38,7 +40,20 @@ eligibility:                # D-009:僅計數,不存任何 URL / count only, nev
 card:
   sample_excerpt_max_chars: 140   # D-002
   llm_enabled: false              # D-001:預設關閉 / off by default
+  llm_model: claude-opus-5        # 啟用時使用 / used when enabled
   max_validation_retries: 3       # 連續驗證失敗進人工佇列 / to human review after this many failures
+  redraft_thresholds: [3, 5, 10, 20, 50, 100, 200, 500]   # 同文帳號數跨越即重新起草 / redraft when account_count crosses
+  original_source_min_shared_authors: 2   # 外部連結須被 ≥N 個相異帳號分享才可成為 original_source 候選(抗 T5 注入)
+
+stage0:
+  archive_enabled: false          # Wayback 存證;上線前實測後開啟 / enable after verifying SPN quota
+  archive_timeout_seconds: 25
+
+fingerprint:
+  sync_window_minutes: 60         # TODO(calibrate) 時序同步窗口 T / synchrony window
+  chart_bucket_minutes: 15        # timing_chart 分桶 / chart bucket size
+  rules_path: config/fingerprint_rules.yaml
+  domain_signals_path: config/domain_signals.yaml
 
 ratelimit:
   anonymous_per_hour: 60

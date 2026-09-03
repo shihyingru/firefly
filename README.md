@@ -102,7 +102,9 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 (cd backend && ../.venv/bin/python -m pytest -q)
 ```
 
-示範資料 / Demo data:`FIREFLY_INLINE_JOBS=1 .venv/bin/python scripts/seed_demo.py`
+示範資料(走完整 Stage 0-3)/ Demo data (full Stage 0-3):`FIREFLY_EMBEDDER=hash .venv/bin/python scripts/seed_demo.py`
+
+嵌入模型 / Embedding model:正式環境安裝 `pip install -e "backend[ml]"` 後自動使用 multilingual-e5-base;無模型時退回字元 n-gram 雜湊嵌入,並記錄於叢集 signal_summary.embedder。/ Production installs the `ml` extra and uses multilingual-e5-base; without it the pipeline falls back to hashed char n-grams and records that in the cluster's signal_summary.
 
 | 路徑 / Path | 內容 / What |
 |---|---|
@@ -110,11 +112,14 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 | `backend/firefly/models.py` | 文件 08 資料模型 / doc-08 data model |
 | `backend/firefly/api/routes.py` | 文件 06 端點 / doc-06 endpoints |
 | `backend/tests/test_privacy_guard.py` | 「明確不存」守衛 / never-stored guard |
+| `backend/firefly/pipeline/` | Stage 0-3:adapters、stage1_fingerprint、stage2_cluster、stage3_card、card_schema、llm、ingest |
+| `backend/tests/data/injection_corpus.jsonl` | 文件 14 T5 注入迴歸語料(中/英/日/混淆)/ injection corpus |
+| `config/fingerprint_rules.yaml`、`config/domain_signals.yaml` | 排版規則庫、網域訊號種子 / rule library, domain seeds |
 | `docs/zh-TW/17-實作決議紀錄.md` | 實作決議 D-001… / decision record |
 
 ## Status
 
-Wave 1 in progress: 1.1 backend core done; 1.2 AI pipeline next. See doc 16 for the handoff prompt and doc 17 for decisions.
+Wave 1 in progress: 1.1 backend core and 1.2 AI pipeline done; 1.3 LINE bot next. See doc 16 for the handoff prompt and doc 17 for decisions.
 
 ## License
 

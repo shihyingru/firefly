@@ -24,6 +24,7 @@ jobs:
       TEST_REDIS_URL: redis://127.0.0.1:6379/15
       DEVICE_TOKEN_PEPPER: ci-pepper
       LINE_ID_HMAC_KEY: ci-hmac
+      FIREFLY_EMBEDDER: hash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

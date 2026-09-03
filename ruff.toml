@@ -1,0 +1,6 @@
+# 全 repo 共用 lint 設定 / repo-wide lint settings(backend/pyproject.toml 亦同)
+line-length = 110
+target-version = "py311"
+[lint]
+select = ["E", "F", "I", "B"]
+ignore = ["B008", "E501", "E402"]
