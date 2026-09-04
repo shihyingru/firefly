@@ -33,7 +33,17 @@ New arbiters receive 5 cards daily for the first 3 days, then self-serve from th
 
 ## 邊界與可驗證性 / Boundaries, and how to verify each one
 
-每一條承諾都由測試強制,CI 每次推送都會執行。任何人可重跑:`cd backend && pytest -q tests/test_line_onboarding.py`。
+每一條承諾都由測試強制,CI 每次推送都會執行。任何人可重跑:
+
+```bash
+cd backend && pytest -q tests/test_line_onboarding.py    # 期望 6 passed
+```
+
+> 程式與測試目前在分支 `claude/firefly-project-planning-q24ahc`(Wave 1),尚未併入 `main`。
+> 在 main 上看不到 `backend/`,請切到該分支驗證。Wave 1 併入後此註記即可移除。
+> The code and tests currently live on the Wave 1 branch, not yet on `main`.
+> Check them out there; this note can go once Wave 1 merges.
+
 Every promise below is enforced by a test that CI runs on every push. Anyone can re-run them.
 
 | 項目 | 承諾 | 驗證測試 / Enforcing test |
