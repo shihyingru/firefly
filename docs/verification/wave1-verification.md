@@ -11,7 +11,15 @@ python3 -m venv .venv && .venv/bin/pip install -e "backend[dev]"
 export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_URL=redis://127.0.0.1:6379/0
 export FIREFLY_INLINE_JOBS=1 FIREFLY_SOURCE_ADAPTER=mock FIREFLY_EMBEDDER=hash
 (cd backend && ../.venv/bin/alembic upgrade head)
-(cd backend && ../.venv/bin/python -m pytest -q)        # 期望 / expect: 69 passed
+
+# 測試用的是另一個資料庫(conftest.py 讀 TEST_DATABASE_URL,預設 firefly_test),
+# 不是上面的 DATABASE_URL。它必須先存在且已啟用 pgvector。
+# Tests use a SEPARATE database (conftest.py reads TEST_DATABASE_URL, default firefly_test),
+# not the DATABASE_URL above. Create it first, with pgvector enabled.
+psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE firefly_test"
+psql -h 127.0.0.1 -U postgres -d firefly_test -c "CREATE EXTENSION IF NOT EXISTS vector"
+
+(cd backend && ../.venv/bin/python -m pytest -q)        # 期望 / expect: 75 passed
 (cd backend && ../.venv/bin/uvicorn firefly.main:app --port 8000 &)
 ```
 

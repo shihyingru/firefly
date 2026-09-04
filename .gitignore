@@ -1,6 +1,8 @@
 # Env & secrets
 .env
 .env.*
+# 範本必須進版控(README 快速上手第一步)/ the template must stay tracked
+!.env.example
 *.pem
 *.key
 secrets/
@@ -28,9 +30,15 @@ xcuserdata/
 # Data & artifacts
 *.db
 *.sqlite3
-data/
-snapshots/
+# 只忽略根目錄的執行期資料。無錨點的 data/ 會比對每一層,
+# 曾吃掉 backend/tests/data/(文件 14 T5 注入語料)導致 CI 收集失敗。
+# Root-level runtime data only. An unanchored data/ matches at every depth and
+# previously swallowed backend/tests/data/ (doc-14 T5 corpus), breaking CI collection.
+/data/
+/snapshots/
 *.log
+# 建置產物不進版控 / build artifacts stay untracked
+*.egg-info/
 
 # OS / editor
 .DS_Store
