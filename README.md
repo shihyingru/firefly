@@ -104,7 +104,7 @@ export DATABASE_URL=postgresql+asyncpg://postgres@127.0.0.1:5432/firefly REDIS_U
 
 示範資料(走完整 Stage 0-3)/ Demo data (full Stage 0-3):`FIREFLY_EMBEDDER=hash .venv/bin/python scripts/seed_demo.py`
 
-嵌入模型 / Embedding model:正式環境安裝 `pip install -e "backend[ml]"` 後自動使用 multilingual-e5-base;無模型時退回字元 n-gram 雜湊嵌入,並記錄於叢集 signal_summary.embedder。/ Production installs the `ml` extra and uses multilingual-e5-base; without it the pipeline falls back to hashed char n-grams and records that in the cluster's signal_summary.
+嵌入模型 / Embedding model:Docker 映像已內含 CPU 版 torch 與 multilingual-e5-base(D-012),執行期不連 HuggingFace。以 `docker compose run --rm api python -m firefly.cli check-embedder` 確認生效中的後端;設定要 e5 卻退回雜湊嵌入時該指令非零離開。不用 Docker 時裝 `pip install -e "backend[ml]"`。無模型即退回字元 n-gram 雜湊嵌入,並記錄於叢集 `signal_summary.embedder`。/ The image ships CPU-only torch and the model, so run time never calls HuggingFace. `check-embedder` reports the active backend and exits non-zero if e5 was configured but the hashed fallback is live.
 
 | 路徑 / Path | 內容 / What |
 |---|---|

@@ -25,6 +25,11 @@ os.environ["DATABASE_URL"] = TEST_DB
 os.environ["REDIS_URL"] = TEST_REDIS
 os.environ["FIREFLY_INLINE_JOBS"] = "1"
 os.environ["FIREFLY_SOURCE_ADAPTER"] = "mock"
+# 測試一律用雜湊嵌入,與 ml extra 是否安裝無關。setdefault 保留外部覆寫,
+# 供 e5 煙霧測試以 FIREFLY_EMBEDDER=e5 刻意跑真模型。
+# Tests always use the hashed embedder, whether or not the ml extra is installed.
+# setdefault keeps the override so the e5 smoke test can opt in deliberately.
+os.environ.setdefault("FIREFLY_EMBEDDER", "hash")
 os.environ.setdefault("DEVICE_TOKEN_PEPPER", "test-pepper")
 os.environ.setdefault("LINE_ID_HMAC_KEY", "test-hmac")
 

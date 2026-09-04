@@ -6,10 +6,13 @@
   python -m firefly.cli recompute        # 橋接引擎批次重算(每小時 cron;Phase A 不裁決)
   python -m firefly.cli poll-mentions    # Threads mentions 輪詢(備援路線)
   python -m firefly.cli line-onboarding-push [--force]   # D-014 引導期推播(每日一次;排程器每 5 分鐘呼叫)
+  python -m firefly.cli check-embedder   # 回報實際生效的嵌入後端;設定要 e5 卻退回雜湊時非零離開
 """
 from __future__ import annotations
 
 import asyncio
+import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,7 +20,7 @@ from pathlib import Path
 import yaml
 from sqlalchemy import select
 
-from .config import REPO_ROOT, get_config
+from .config import REPO_ROOT, get_config, get_settings
 from .db import get_sessionmaker
 from .models import DomainSignal
 from .services.audit import audit
@@ -80,7 +83,34 @@ async def _line_onboarding_push(force: bool = False) -> None:
         await s.commit()
 
 
-COMMANDS = {"maintenance": _maintenance, "seed-domains": _seed_domains, "recompute": _recompute, "poll-mentions": _poll_mentions, "line-onboarding-push": _line_onboarding_push}
+async def _check_embedder() -> None:
+    """回報實際生效的嵌入後端。設定要 e5 卻退回雜湊嵌入即非零離開(A1 上線檢查)。
+    Report the embedding backend actually in use; exit non-zero if e5 is configured but the
+    hashed fallback is active. get_embedder() swallows every load error, so without this the
+    degradation is only visible later in cluster.signal_summary.embedder."""
+    from .pipeline.embedding import get_embedder
+
+    cfg = get_config().embedding
+    configured = os.environ.get("FIREFLY_EMBEDDER", cfg.backend)
+    embedder = get_embedder()
+    dim = len(embedder.embed(["螢火 / firefly"])[0])
+    # 一併回報設定檔位置:設定檔沒被讀到時參數會靜默退回預設值,這裡讓它可見
+    # Report the config path too: when it is not found, tunables silently fall back to defaults
+    from pathlib import Path
+
+    cfg_path = get_settings().firefly_config_path
+    print(json.dumps({"configured": configured, "active": embedder.name, "dim": dim, "config_dim": cfg.dim,
+                      "model": cfg.model, "config_path": cfg_path, "config_found": Path(cfg_path).exists()}, ensure_ascii=False))
+    if configured == "e5" and not embedder.name.startswith("e5:"):
+        print(f"ERROR: configured e5 ({cfg.model}) but fell back to {embedder.name}", file=sys.stderr)
+        raise SystemExit(1)
+    if dim != cfg.dim:
+        # D-012:維度必須與模型一致,否則 pgvector 欄位與索引對不上
+        print(f"ERROR: embedding dim {dim} != config dim {cfg.dim}", file=sys.stderr)
+        raise SystemExit(1)
+
+
+COMMANDS = {"maintenance": _maintenance, "seed-domains": _seed_domains, "recompute": _recompute, "poll-mentions": _poll_mentions, "line-onboarding-push": _line_onboarding_push, "check-embedder": _check_embedder}
 
 
 def main(argv: list[str] | None = None) -> int:

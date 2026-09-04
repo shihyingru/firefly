@@ -9,7 +9,8 @@
 - [ ] **合併分支**:開 PR 把 `claude/firefly-project-planning-q24ahc` 併入 `main`;GitHub Actions CI 會跑 75 個測試。
 - [ ] **產生密鑰**填入 `.env`(每個都獨立隨機,32 bytes 以上):`DEVICE_TOKEN_PEPPER`、`LINE_ID_HMAC_KEY`、`SERVICE_TOKEN`、`THREADS_WEBHOOK_VERIFY_TOKEN`、`LINE_PUSH_ENC_KEY`(Fernet,指令在驗證文件 1.3b)。
 - [ ] **VPS 部署**:網域、HTTPS 憑證、`PUBLIC_BASE_URL`;`docker compose up --build`;`curl /healthz`。
-- [ ] **嵌入模型**:`pip install -e "backend[ml]"`(或在 Dockerfile 加入),確認叢集 `signal_summary.embedder` 顯示 `e5:intfloat/multilingual-e5-base`。
+- [x] ~~**嵌入模型**:在 Dockerfile 加入~~ — 已完成(C3)。映像內含 CPU torch 與模型,建置時自我檢查。
+      部署後確認:`docker compose run --rm api python -m firefly.cli check-embedder` → exit 0 且 `active` 為 `e5:intfloat/multilingual-e5-base`。
 - [ ] **LINE 官方帳號**:建立 Messaging API channel → `LINE_CHANNEL_SECRET`、`LINE_CHANNEL_ACCESS_TOKEN` → Webhook URL `https://<host>/v1/line/webhook` 按 Verify → 富選單按鈕 postback `queue:today`(顯示文字「今日佇列」)。
 - [ ] **網域訊號種子**:把 A/B 級來源(如 Doublethink Lab 報告)的網域填入 `config/domain_signals.yaml`,執行 `python -m firefly.cli seed-domains`。
 - [ ] **隱私權政策定稿**:以 `docs/legal/privacy-policy-draft.md` 為底,填聯絡方式,安排法務諮詢(文件 13),公開網址。

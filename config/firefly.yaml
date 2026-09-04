@@ -16,7 +16,9 @@ clustering:
 
 embedding:
   backend: e5               # e5(sentence-transformers,正式)| hash(字元 n-gram,測試/無模型時的替代;審計會記錄)
-  model: intfloat/multilingual-e5-base   # D-012
+  model: intfloat/multilingual-e5-base   # D-012;改這裡要同時改 backend/Dockerfile 的
+                                         # FIREFLY_EMBED_MODEL build arg 並重建映像
+                                         # change this and the Dockerfile build arg together, then rebuild
   dim: 768                                # 必須與 model 一致;改動需重建索引 / must match model; changing requires reindex
   query_prefix: "query: "                 # e5 慣例 / e5 convention
   passage_prefix: "passage: "

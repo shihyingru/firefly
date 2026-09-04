@@ -38,7 +38,9 @@ psql -h 127.0.0.1 -U postgres -d firefly_test -c "CREATE EXTENSION IF NOT EXISTS
 3. `curl localhost:8000/v1/open/audit-log` → 可見 `fetched`、`formed`、`state_changed(draft→candidate)` 事件。
 4. 注入迴歸:`pytest -q tests/test_injection_regression.py` → 15 個語料(中/英/日/base64/全形/零寬/同形字/HTML/JSON)全部通過;模擬被注入的 LLM 輸出皆被驗證擋下。
 5. 白名單驗證:`pytest -q tests/test_card_validation.py`。
-6. 正式嵌入模型(選用):`pip install -e "backend[ml]"` 並移除 `FIREFLY_EMBEDDER=hash` → 叢集 `signal_summary.embedder` 顯示 `e5:intfloat/multilingual-e5-base`。
+6. 正式嵌入模型:映像已內含。`docker compose run --rm api python -m firefly.cli check-embedder` → `{"configured":"e5","active":"e5:intfloat/multilingual-e5-base","dim":768,...,"config_found":true}` 且 exit 0。
+   **務必確認 `config_found` 為 true**:為 false 代表掛載的 `config/firefly.yaml` 沒被讀到,
+   所有可調參數會靜默退回程式預設值(θ_join、θ_helpful、各功能旗標)。退回雜湊嵌入時 exit 1 並印出原因。叢集 `signal_summary.embedder` 應顯示同一個名稱。本機(非 Docker):`pip install --index-url https://download.pytorch.org/whl/cpu torch && pip install -e "backend[ml]"`。
 
 ## 1.3 LINE Bot
 

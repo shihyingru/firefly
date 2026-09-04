@@ -1,0 +1,51 @@
+# e5 嵌入模型煙霧測試(文件 D-012)。/ e5 embedding smoke test (D-012).
+#
+# 刻意不放進主 CI:需要下載 CPU 版 torch 與約 1GB 的模型,每次推送都跑會讓
+# 主 CI 變慢且相依外部網路。主 CI 以 FIREFLY_EMBEDDER=hash 執行,不碰這條路徑。
+# Deliberately not in the main CI: it downloads CPU torch and a ~1GB model. Running that on
+# every push would make CI slow and network-dependent. Main CI runs with the hashed embedder.
+name: e5-smoke
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"   # 每週一 03:00 UTC / Mondays
+
+jobs:
+  embedder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      # 與 backend/Dockerfile 同一套指令:--index-url 讓 CPU 索引不可達時直接失敗,
+      # 不會悄悄改抓 PyPI 的 CUDA 版。/ same commands as the Dockerfile.
+      - name: Install CPU torch and the ml extra
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e "backend[ml]"
+
+      # 設定要 e5 卻退回雜湊嵌入即失敗。/ fails if e5 is configured but the fallback is active.
+      - name: e5 is active, not the hashed fallback
+        working-directory: backend
+        env: { FIREFLY_EMBEDDER: e5 }
+        run: python -m firefly.cli check-embedder
+
+      # 模型載入成功還不夠,要確認它真的有語意:同義句必須明顯比無關句更接近。
+      # Loading is not enough: paraphrases must score clearly above unrelated text.
+      - name: e5 produces meaningful multilingual similarity
+        working-directory: backend
+        env: { FIREFLY_EMBEDDER: e5 }
+        run: |
+          python - <<'PY'
+          from firefly.pipeline.embedding import cosine, get_embedder
+          e = get_embedder()
+          assert e.name.startswith("e5:"), e.name
+          base = "颱風將於明天登陸台灣東部,請民眾提前準備"
+          para = "明天颱風會從台灣東岸登陸,請大家提早做好準備"
+          other = "這間拉麵店的叉燒很嫩,湯頭偏鹹"
+          v = e.embed([base, para, other])
+          near, far = cosine(v[0], v[1]), cosine(v[0], v[2])
+          print(f"paraphrase={near:.4f}  unrelated={far:.4f}  margin={near - far:.4f}")
+          assert near > far + 0.05, f"e5 similarity is not discriminating: {near:.4f} vs {far:.4f}"
+          PY
